@@ -106,14 +106,37 @@ select t1.name
                    on t1.custid = t2.custid
  where t2.orderid is null; 
   
-
-
-
-
 --(9) 주문 금액의 총액과 주문의 평균 금액
+select sum(saleprice) "총액", 
+       avg(saleprice) "평균", 
+       sum(saleprice)/count(saleprice) "평균2"
+  from orders;
 --(10) 고객의 이름과 고객별 구매액
---(11) 고객의 이름과 고객이 구매한 도서 목록
---(12) 도서의 가격(Book 테이블)과 판매가격(Orders 테이블)의 차이가 가장 많은 주문
---(13) 도서의 판매액 평균보다 자신의 구매액 평균이 더 높은 고객의 이름
+  select t2.name "고객명", sum(t1.saleprice) "구매액"
+    from orders t1, customer t2
+   where t1.custid = t2.custid
+group by t1.custid, t2.name;
 
+--(11) 고객의 이름과 고객이 구매한 도서 목록
+    select t2.name "이름", t3.bookname "도서명"
+      from orders t1, customer t2, book t3
+     where t1.custid = t2.custid
+       and t1.bookid = t3.bookid;
+--(12) 도서의 가격(Book 테이블)과 판매가격(Orders 테이블)의 차이가 가장 많은 주문
+    select t3.orderid "주문번호"
+      from orders t3, book t4
+     where t3.bookid = t4.bookid
+       and t4.price - t3.saleprice = ( select max(t2.price - t1.saleprice)
+                                         from orders t1, book t2
+                                        where t1.bookid = t2.bookid );
+--(13) 도서의 판매액 평균보다 자신의 구매액 평균이 더 높은 고객의 이름
+   select t2.name "고객명"
+     from orders t1, customer t2
+    where t1.custid = t2.custid
+ group by t2.custid, t2.name  
+   having avg(t1.saleprice) > ( select avg(saleprice)
+                                   from orders );
+     
+   
+   
                      
