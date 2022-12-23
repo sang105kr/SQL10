@@ -27,8 +27,7 @@ select *
 
 select *
   from customer t1 left outer join orders t2
-                   on t1.custid = t2.custid;  
-   
+                   on t1.custid = t2.custid;
 -- right outer join   
 select *
   from customer t1, orders t2

@@ -137,6 +137,51 @@ group by t1.custid, t2.name;
    having avg(t1.saleprice) > ( select avg(saleprice)
                                    from orders );
      
+--3 마당서점에서 다음의 심화된 질문에 대해 SQL 문을 작성하시오.
+--  (1) 박지성이 구매한 도서의 출판사와 같은 출판사에서 도서를 구매한 고객의 이름   
+select t2.name "고객명", t3.publisher "출판사", t3.bookname "도서명" 
+  from orders t1, customer t2, book t3
+ where t1.custid = t2.custid
+   and t1.bookid = t3.bookid
+   and t3.publisher in ( select distinct t3.publisher
+                           from orders t1, customer t2, book t3
+                          where t1.custid = t2.custid
+                            and t1.bookid = t3.bookid
+                            and t2.name = '박지성' )
+   and t2.name != '박지성';
+--  (2) 두 개 이상의 서로 다른 출판사에서 도서를 구매한 고객의 이름
+--case1)
+select name
+  from customer
+ where custid in ( select t1.custid
+                     from orders t1, book t2
+                    where t1.bookid = t2.bookid 
+                 group by t1.custid
+                 having count(distinct t2.publisher) >= 2 );
+--case2)
+select t3.name
+  from customer t3
+ where ( select count(distinct t2.publisher)
+           from orders t1, book t2
+          where t1.bookid = t2.bookid 
+            and t1.custid = t3.custid ) >= 2 ; 
+ 
+--  (3) 전체 고객의 30% 이상이 구매한 도서 
+select bookname
+  from book
+ where bookid in   (select bookid
+                      from orders 
+                  group by bookid
+                    having count(custid) > (select count(custid) * 0.3
+                                              from customer));
+  
+select t1.bookname
+  from book t1
+ where (select count(bookid)
+          from orders
+         where bookid = t1.bookid ) > (select count(custid) * 0.3
+                                         from customer); 
+
    
    
                      
