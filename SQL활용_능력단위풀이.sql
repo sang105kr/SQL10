@@ -290,8 +290,8 @@ as
       from works t1, employee t2, project t3
      where t1.empno  = t2.empno
        and t1.projno = t3.projno
-  group by t2.name, t3.projname;     
-  
+  group by t2.name, t3.projname     
+  order by t2.name, t3.projname;
 select name "이름",projectname "프로젝트명",hours "참여시간"
   from vw_proj;
 --15. EXISTS 연산자로 ‘빅데이터 구축’ 프로젝트에 참여하는 사원의 이름을 보이시오.
@@ -321,10 +321,7 @@ select *
  where table_name = 'EMPLOYEE' 
    and index_name = 'IX_EMPLOYEE2';
 --17. 부서별로 급여가 부서평균 급여 보다 높은 사원의 이름과 월급을 보이시오.
-select t3.deptname "부서명", t1.name "이름", t1.salary "급여",
-       ( select avg(salary)
-           from employee 
-          where deptno = t1.deptno ) "부서평균 급여"
+select t3.deptname "부서명", t1.name "이름", t1.salary "급여"
   from employee t1, department t3
  where t1.deptno = t3.deptno 
    and t1.salary > (  select avg(salary)
